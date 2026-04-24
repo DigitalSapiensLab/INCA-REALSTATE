@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Inca Estates — No vendemos casas. Vendemos Perú.</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ---------- TWEAKABLE DEFAULTS ---------- */
+:root {
+  /* Core dark luxury palette */
+  --bg-primary: #0E1014;
+  --bg-secondary: #16191F;
+  --bg-tertiary: #1C2028;
+  --bg-light: #F5F1E8;
+  --bg-cream: #F8F5EE;
+
+  --gold-primary: #C9A961;
+  --gold-soft: #D4B87A;
+  --gold-deep: #A88B47;
+  --gold-muted: #E8D5A3;
+  --gold-bg: rgba(201, 169, 97, 0.08);
+
+  --text-on-dark: #F5F1E8;
+  --text-on-dark-muted: #A8A49C;
+  --text-on-dark-subtle: #6B6860;
+  --text-on-light: #0E1014;
+  --text-on-light-muted: #5A5A5A;
+
+  --border-dark: rgba(255, 255, 255, 0.08);
+  --border-dark-hover: rgba(201, 169, 97, 0.25);
+  --border-gold: rgba(201, 169, 97, 0.4);
+
+  --font-display: 'Fraunces', 'Cormorant Garamond', serif;
+  --font-serif: 'Cormorant Garamond', 'Fraunces', serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Density */
+  --section-py: 140px;
+  --content-max: 1320px;
+  --gutter: 48px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--bg-primary); color: var(--text-on-dark); font-family: var(--font-sans); font-weight: 300; -webkit-font-smoothing: antialiased; }
+body { overflow-x: hidden; }
+img { display: block; max-width: 100%; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+
+/* Density variants */
+[data-density="airy"] { --section-py: 180px; --gutter: 64px; }
+[data-density="compact"] { --section-py: 96px; --gutter: 32px; }
+
+/* Motif intensity controls visibility of decorative patterns */
+[data-motif="low"] .motif-pattern { opacity: 0.35; }
+[data-motif="low"] .motif-divider { opacity: 0.5; }
+[data-motif="high"] .motif-pattern { opacity: 1.3; }
+[data-motif="high"] .motif-extra { display: block; }
+.motif-extra { display: none; }
+
+/* Reusable pieces */
+.wrap { max-width: var(--content-max); margin: 0 auto; padding: 0 var(--gutter); }
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold-primary);
+  font-weight: 400;
+}
+.h-display {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-style: normal;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+.serif { font-family: var(--font-serif); font-weight: 400; }
+
+/* Gold rule */
+.gold-rule { height: 1px; background: linear-gradient(90deg, transparent, var(--gold-primary) 20%, var(--gold-primary) 80%, transparent); opacity: 0.55; }
+
+/* Stepped pyramid divider (Inca motif) */
+.stepped-divider {
+  width: 56px; height: 18px;
+  background-image:
+    linear-gradient(var(--gold-primary), var(--gold-primary)),
+    linear-gradient(var(--gold-primary), var(--gold-primary)),
+    linear-gradient(var(--gold-primary), var(--gold-primary));
+  background-repeat: no-repeat;
+  background-size: 56px 2px, 40px 2px, 24px 2px;
+  background-position: 0 0, 8px 6px, 16px 12px;
+  opacity: 0.85;
+}
+.stepped-divider.inverse {
+  background-position: 0 16px, 8px 10px, 16px 4px;
+}
+
+/* Geometric line pattern background */
+.motif-pattern {
+  position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(201,169,97,0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,169,97,0.07) 1px, transparent 1px);
+  background-size: 80px 80px;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+}
+
+/* Numbered Quechua section */
+.section-number {
+  font-family: var(--font-display);
+  font-size: 120px;
+  font-weight: 300;
+  color: var(--gold-primary);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+}
+.quechua {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  color: var(--gold-primary);
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+/* Buttons */
+.btn-gold {
+  display: inline-flex; align-items: center; gap: 14px;
+  padding: 18px 28px;
+  background: var(--gold-primary);
+  color: #0E1014;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  transition: background .25s ease, transform .25s ease;
+  border: 0;
+}
+.btn-gold:hover { background: var(--gold-soft); transform: translateX(2px); }
+.btn-gold .arrow { width: 24px; height: 1px; background: #0E1014; position: relative; }
+.btn-gold .arrow::after { content: ''; position: absolute; right: 0; top: -3px; width: 7px; height: 7px; border-top: 1px solid #0E1014; border-right: 1px solid #0E1014; transform: rotate(45deg); }
+
+.btn-ghost {
+  display: inline-flex; align-items: center; gap: 14px;
+  padding: 18px 28px;
+  background: transparent;
+  color: var(--text-on-dark);
+  border: 1px solid var(--border-dark);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  transition: border-color .25s ease, color .25s ease;
+}
+.btn-ghost:hover { border-color: var(--gold-primary); color: var(--gold-primary); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: #2a2f38; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-deep); }
+
+/* ---------- NAVBAR ---------- */
+.navbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 40;
+  padding: 22px var(--gutter);
+  display: flex; align-items: center; justify-content: space-between;
+  background: linear-gradient(180deg, rgba(14,16,20,0.95), rgba(14,16,20,0.6));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-dark);
+}
+.brand { display: flex; align-items: center; gap: 14px; }
+.brand-mark {
+  width: 40px; height: 40px; position: relative;
+}
+.brand-mark svg { width: 100%; height: 100%; }
+.brand-text { display: flex; flex-direction: column; line-height: 1; }
+.brand-text .name { font-family: var(--font-display); font-size: 20px; letter-spacing: 0.04em; color: var(--text-on-dark); }
+.brand-text .sub { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.32em; color: var(--gold-primary); margin-top: 4px; text-transform: uppercase; }
+
+.nav-links { display: flex; gap: 36px; }
+.nav-links a {
+  font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; font-weight: 400;
+  color: var(--text-on-dark-muted); transition: color .2s ease;
+  position: relative; padding: 6px 0;
+}
+.nav-links a:hover, .nav-links a.active { color: var(--gold-primary); }
+.nav-links a.active::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: var(--gold-primary); }
+
+.nav-right { display: flex; align-items: center; gap: 28px; }
+.lang-toggle { display: flex; gap: 10px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.2em; }
+.lang-toggle span { color: var(--text-on-dark-subtle); cursor: pointer; }
+.lang-toggle span.active { color: var(--gold-primary); }
+.lang-toggle .sep { color: var(--text-on-dark-subtle); }
+
+.phone-chip {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; border: 1px solid var(--border-dark);
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em;
+  color: var(--gold-primary);
+}
+.phone-chip::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--gold-primary); box-shadow: 0 0 8px var(--gold-primary);
+}
+
+/* ---------- SOCIAL SIDEBAR ---------- */
+.social-sidebar {
+  position: fixed; left: 0; top: 50%; transform: translateY(-50%);
+  z-index: 30; display: flex; flex-direction: column; align-items: center; gap: 20px;
+  padding: 24px 18px;
+  border-right: 1px solid var(--border-dark);
+  background: rgba(14,16,20,0.4);
+  backdrop-filter: blur(8px);
+}
+.social-sidebar .label {
+  writing-mode: vertical-rl; transform: rotate(180deg);
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.3em;
+  color: var(--gold-primary); text-transform: uppercase;
+}
+.social-sidebar .line { width: 1px; height: 60px; background: var(--border-dark); }
+.social-sidebar .icons { display: flex; flex-direction: column; gap: 16px; }
+.social-sidebar .icons a { color: var(--text-on-dark-muted); transition: color .2s ease; }
+.social-sidebar .icons a:hover { color: var(--gold-primary); }
+.social-sidebar svg { width: 14px; height: 14px; display: block; }
+
+/* ---------- SECTIONS COMMON ---------- */
+section { position: relative; }
+.section-head { display: flex; flex-direction: column; gap: 16px; margin-bottom: 72px; }
+.section-head .label-row { display: flex; align-items: center; gap: 20px; }
+.section-head h2 { font-size: clamp(40px, 5vw, 64px); }
+.section-head .lede { max-width: 640px; color: var(--text-on-dark-muted); font-size: 17px; line-height: 1.6; margin-top: 12px; }
+
+/* Utility */
+.hidden { display: none !important; }
+
+/* Placeholder image tile */
+.ph-tile {
+  position: relative;
+  background:
+    repeating-linear-gradient(135deg, rgba(201,169,97,0.04) 0 2px, transparent 2px 14px),
+    linear-gradient(180deg, #1a1e25, #12161d);
+  border: 1px solid var(--border-dark);
+  color: var(--text-on-dark-subtle);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ---------- TWEAKS PANEL ---------- */
+.tweaks-panel {
+  position: fixed; bottom: 24px; right: 24px; z-index: 100;
+  width: 320px;
+  background: #13161c;
+  border: 1px solid var(--border-gold);
+  padding: 22px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,169,97,0.15);
+  display: none;
+}
+.tweaks-panel.open { display: block; }
+.tweaks-panel h4 { font-family: var(--font-display); font-size: 18px; font-weight: 400; color: var(--gold-primary); margin-bottom: 4px; }
+.tweaks-panel .sub { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.2em; color: var(--text-on-dark-subtle); text-transform: uppercase; margin-bottom: 20px; }
+.tweaks-row { margin-bottom: 18px; }
+.tweaks-row label { display: block; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.2em; color: var(--text-on-dark-muted); text-transform: uppercase; margin-bottom: 10px; }
+.tweaks-options { display: flex; gap: 6px; }
+.tweaks-options button {
+  flex: 1; padding: 10px 8px; font-family: var(--font-sans); font-size: 11px;
+  color: var(--text-on-dark-muted); border: 1px solid var(--border-dark);
+  background: transparent; transition: all .2s ease;
+}
+.tweaks-options button.active { border-color: var(--gold-primary); color: var(--gold-primary); background: var(--gold-bg); }
+.tweaks-options button:hover { color: var(--gold-primary); }
+
+@media (max-width: 960px) {
+  :root { --gutter: 24px; --section-py: 96px; }
+  .social-sidebar, .nav-links, .phone-chip { display: none; }
+  .section-number { font-size: 72px; }
+}
+</style>
+</head>
+<body data-density="normal" data-motif="normal">
+
+<!-- Root for React app -->
+<div id="root"></div>
+
+<!-- TWEAKABLE DEFAULTS (persisted) -->
+<script id="tweak-defaults" type="application/json">
+/*EDITMODE-BEGIN*/{
+  "heroVariant": "fullbleed",
+  "motif": "normal",
+  "density": "airy"
+}/*EDITMODE-END*/
+</script>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="src/icons.jsx"></script>
+<script type="text/babel" src="src/data.jsx"></script>
+<script type="text/babel" src="src/regiondata.jsx"></script>
+<script type="text/babel" src="src/cities-data.jsx"></script>
+<script type="text/babel" src="src/macro-region-data.jsx"></script>
+<script type="text/babel" src="src/region-showcase.jsx"></script>
+<script type="text/babel" src="src/nav.jsx"></script>
+<script type="text/babel" src="src/hero.jsx"></script>
+<script type="text/babel" src="src/porque.jsx"></script>
+<script type="text/babel" src="src/peru-geo.jsx"></script>
+<script type="text/babel" src="src/map.jsx"></script>
+<script type="text/babel" src="src/calculator.jsx"></script>
+<script type="text/babel" src="src/costliving.jsx"></script>
+<script type="text/babel" src="src/properties.jsx"></script>
+<script type="text/babel" src="src/gastronomia.jsx"></script>
+<script type="text/babel" src="src/footer.jsx"></script>
+<script type="text/babel" src="src/chat.jsx"></script>
+<script type="text/babel" src="src/tweaks.jsx"></script>
+<script type="text/babel" src="src/app.jsx"></script>
+
+</body>
+</html>

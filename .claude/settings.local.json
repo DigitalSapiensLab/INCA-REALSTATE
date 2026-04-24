@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm --version)",
+      "Bash(npx --version)",
+      "WebFetch(domain:api.anthropic.com)",
+      "Bash(mkdir -p \"c:/Users/user1/Desktop/SISTEMAS CLAUDE/INCA REALSTATE/_design_source\")",
+      "Bash(cp \"C:\\\\Users\\\\user1\\\\.claude\\\\projects\\\\c--Users-user1-Desktop-SISTEMAS-CLAUDE-INCA-REALSTATE\\\\49cd020e-ac8a-422b-9739-751d5cc84cc8\\\\tool-results\\\\webfetch-1776963875156-enf3wd.bin\" design.bin)",
+      "Bash(tar -tf design.tar)",
+      "Bash(tar -xf design.tar)",
+      "Bash(mkdir -p web/src web/assets)",
+      "Bash(cp _design_source/inca-realstate/project/\"Inca Estates.html\" web/index.html)",
+      "Bash(cp _design_source/inca-realstate/project/src/*.jsx web/src/)",
+      "Bash(cp _design_source/inca-realstate/project/assets/peru-silhouette.png web/assets/)",
+      "Bash(node server.js)",
+      "Bash(curl -s -o /dev/null -w \"index.html → %{http_code}\\\\n\" http://localhost:5173/)",
+      "Bash(curl -s -o /dev/null -w \"app.jsx → %{http_code}\\\\n\" http://localhost:5173/src/app.jsx)",
+      "Bash(curl -s -o /dev/null -w \"data.jsx → %{http_code}\\\\n\" http://localhost:5173/src/data.jsx)",
+      "Bash(curl -s -o /dev/null -w \"silhouette → %{http_code}\\\\n\" http://localhost:5173/assets/peru-silhouette.png)",
+      "Bash(curl -s http://localhost:5173/)",
+      "Bash(node calibrate.js)",
+      "Bash(gh api *)",
+      "mcp__github__create_repository",
+      "mcp__github__search_users",
+      "mcp__github__search_repositories",
+      "Bash(git config *)",
+      "Bash(git init *)",
+      "Bash(git add *)"
+    ]
+  }
+}
