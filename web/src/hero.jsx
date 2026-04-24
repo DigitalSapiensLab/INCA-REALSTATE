@@ -24,7 +24,7 @@ function Hero({ variant = 'rotating' }) {
 
           <h1 className="h-display" style={styles.heroTitle}>
             No vendemos<br/>
-            <em style={{fontStyle:'italic', color:'var(--gold-primary)', fontWeight:300}}>casas.</em><br/>
+            <em style={{fontStyle:'italic', color:'var(--gold-primary)', fontWeight:300}}>propiedades.</em><br/>
             Vendemos<br/>
             una vida que<br/>
             <em style={{fontStyle:'italic', color:'var(--gold-primary)', fontWeight:300}}>ya no encuentras</em><br/>
