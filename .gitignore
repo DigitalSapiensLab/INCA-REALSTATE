@@ -9,3 +9,9 @@
 # Node
 node_modules/
 npm-debug.log*
+
+# Raw assets / brand source archives — never publish
+*.zip
+web/assets/hero/_extras/
+web/assets/hero/*Gemini_files/
+web/assets/hero/Gemini_Generated_Image*.png
