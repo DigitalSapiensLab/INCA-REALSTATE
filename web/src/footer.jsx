@@ -15,7 +15,7 @@ function Footer() {
           />
           <BandItem
             label="Atención"
-            lines={['Lun-Vie · 09:00 — 19:00 CET', 'hola@incaestates.com']}
+            lines={['Lun-Vie · 09:00 — 19:00 CET', 'hola@andescapitalestates.com']}
           />
         </div>
       </div>
@@ -34,8 +34,8 @@ function Footer() {
                   </svg>
                 </div>
                 <div className="brand-text">
-                  <span className="name">INCA ESTATES</span>
-                  <span className="sub">Propiedad · Perú</span>
+                  <span className="name-top">ANDES CAPITAL</span>
+                  <span className="name-bot">ESTATES</span>
                 </div>
               </div>
               <p style={{color:'var(--text-on-dark-muted)', fontSize:14, lineHeight:1.7, maxWidth:340}}>
@@ -53,7 +53,7 @@ function Footer() {
 
             <FooterCol title="Descubrir Perú" items={['Cultura y patrimonio','Gastronomía','Biodiversidad','Historia inca','Mejor época']} />
             <FooterCol title="Inversión" items={['Calculadora de retorno','Guía del comprador','Trámites y visas','Costo de vida','Financiación']} />
-            <FooterCol title="Plataforma" items={['Propiedades','Regiones','Inmobiliarias B2B','Inca AI','Blog editorial']} />
+            <FooterCol title="Plataforma" items={['Propiedades','Regiones','Inmobiliarias B2B','Andes AI','Blog editorial']} />
 
             <div>
               <div className="quechua" style={{marginBottom:18}}>Recibe la revista</div>
@@ -69,11 +69,11 @@ function Footer() {
 
           {/* Oversized wordmark */}
           <div style={footerStyles.wordmark}>
-            INCA ESTATES
+            ANDES CAPITAL ESTATES
           </div>
 
           <div style={footerStyles.bottom}>
-            <span style={{color:'var(--text-on-dark-subtle)', fontSize:12}}>© 2026 Inca Estates · Todos los derechos reservados</span>
+            <span style={{color:'var(--text-on-dark-subtle)', fontSize:12}}>© 2026 Andes Capital Estates · Todos los derechos reservados</span>
             <div style={{display:'flex', gap:24, fontSize:12, color:'var(--text-on-dark-subtle)'}}>
               <a href="#">Privacidad</a>
               <a href="#">Aviso legal</a>

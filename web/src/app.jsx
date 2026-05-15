@@ -4,7 +4,7 @@ function TypographicHero() {
     <section id="inicio" style={{minHeight:'100vh', padding:'160px 0 100px', position:'relative', overflow:'hidden', display:'flex', alignItems:'center'}}>
       <div className="motif-pattern" />
       <div className="wrap" style={{position:'relative', zIndex:1, textAlign:'center'}}>
-        <div className="quechua" style={{marginBottom:40}}>ꟼ Inca Estates · est. 2026</div>
+        <div className="quechua" style={{marginBottom:40}}>ꟼ Andes Capital Estates · est. 2026</div>
         <h1 style={{fontFamily:'var(--font-display)', fontWeight:300, fontSize:'clamp(72px, 11vw, 200px)', letterSpacing:'-0.035em', lineHeight:0.95}}>
           Un país,<br/>
           <em style={{fontStyle:'italic', color:'var(--gold-primary)'}}>luego</em> una casa.
@@ -36,7 +36,7 @@ function FullBleedHero() {
 
   return (
     <section id="inicio"
-      style={{minHeight:'100vh', position:'relative', overflow:'hidden'}}>
+      style={{minHeight:'100vh', width:'100%', position:'relative', overflow:'hidden', background:'var(--bg-primary)'}}>
 
       {/* Stacked background layers — cross-fade on rotation */}
       {HERO_SLIDES.map((s, i) => (
@@ -50,8 +50,8 @@ function FullBleedHero() {
         }} />
       ))}
 
-      {/* Dark gradient overlay for text legibility */}
-      <div style={{position:'absolute', inset:0, background:'linear-gradient(180deg, rgba(14,16,20,0.55) 0%, rgba(14,16,20,0.7) 55%, rgba(14,16,20,0.92) 100%)'}} />
+      {/* Subtle gradient overlay — only darkens where text sits, lets image show through */}
+      <div style={{position:'absolute', inset:0, background:'linear-gradient(180deg, rgba(14,16,20,0.15) 0%, rgba(14,16,20,0.05) 35%, rgba(14,16,20,0.35) 70%, rgba(14,16,20,0.75) 100%)'}} />
 
       {/* Top-left slide marker */}
       <div style={{
@@ -79,12 +79,11 @@ function FullBleedHero() {
         </span>
       </div>
 
-      <div className="wrap" style={{position:'relative', zIndex:1, paddingTop:'30vh', paddingBottom:80, minHeight:'100vh', display:'flex', flexDirection:'column', justifyContent:'space-between'}}>
+      <div className="wrap" style={{position:'relative', zIndex:1, paddingTop:'26vh', paddingBottom:40, minHeight:'100vh', display:'flex', flexDirection:'column', justifyContent:'space-between'}}>
         <div>
           <div className="quechua" style={{marginBottom:32}}>ꟼ Patrimonio · Inversión · Vida</div>
-          <h1 className="h-display" style={{fontSize:'clamp(56px, 9vw, 160px)', maxWidth:'75%'}}>
-            No vendemos casas.<br/>
-            <em style={{fontStyle:'italic', color:'var(--gold-primary)'}}>Vendemos Perú.</em>
+          <h1 className="h-display" style={{fontSize:'clamp(40px, 6vw, 104px)', maxWidth:'82%', letterSpacing:'-0.02em'}}>
+            Descubre por qué <em style={{fontStyle:'italic', color:'var(--gold-primary)'}}>Perú</em> se está convirtiendo en una de las <em style={{fontStyle:'italic', color:'var(--gold-primary)'}}>decisiones más inteligentes</em> para vivir e invertir.
           </h1>
           {/* Dynamic caption of current slide */}
           <div style={{marginTop:28, maxWidth:'60%'}}>
@@ -97,24 +96,18 @@ function FullBleedHero() {
           </div>
         </div>
 
-        <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-end', gap:32, flexWrap:'wrap'}}>
-          <p style={{maxWidth:420, fontSize:17, lineHeight:1.6, color:'var(--text-on-dark-muted)'}}>
-            La primera plataforma que te enamora del país antes de enseñarte una propiedad.
-          </p>
-          <div style={{display:'flex', gap:14, alignItems:'center'}}>
-            {/* Dots indicator */}
-            <div style={{display:'flex', gap:8, marginRight:14}}>
-              {HERO_SLIDES.map((s, i) => (
-                <button key={i} onClick={() => setIdx(i)} aria-label={`Slide ${i + 1}`}
-                  style={{
-                    width: i === idx ? 36 : 12, height: 2,
-                    background: i === idx ? (s.color || 'var(--gold-primary)') : 'rgba(255,255,255,0.28)',
-                    border: 0, padding: 0, cursor: 'pointer',
-                    transition: 'all .4s ease',
-                  }} />
-              ))}
-            </div>
-            <button className="btn-gold">Empieza aquí <span className="arrow" /></button>
+        <div style={{display:'flex', justifyContent:'flex-end', alignItems:'flex-end', gap:32, flexWrap:'wrap', marginTop:96}}>
+          {/* Dots indicator */}
+          <div style={{display:'flex', gap:8}}>
+            {HERO_SLIDES.map((s, i) => (
+              <button key={i} onClick={() => setIdx(i)} aria-label={`Slide ${i + 1}`}
+                style={{
+                  width: i === idx ? 36 : 12, height: 2,
+                  background: i === idx ? (s.color || 'var(--gold-primary)') : 'rgba(255,255,255,0.28)',
+                  border: 0, padding: 0, cursor: 'pointer',
+                  transition: 'all .4s ease',
+                }} />
+            ))}
           </div>
         </div>
       </div>
@@ -130,12 +123,39 @@ function App() {
   const [tweaks, setTweaks] = React.useState(defaults);
   const [active, setActive] = React.useState('inicio');
 
+  // Hash-based router for city landing pages.
+  // URL "#ciudad/<id>" → render <CityLanding cityId={id} />.
+  const [route, setRoute] = React.useState(() => parseRoute(window.location.hash));
+  React.useEffect(() => {
+    const onHash = () => setRoute(parseRoute(window.location.hash));
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
+
+  function goHome() {
+    if (window.location.hash) {
+      // Use replaceState to avoid extra history entry.
+      history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
+    setRoute({ name: 'home' });
+  }
+
   React.useEffect(() => {
     document.body.setAttribute('data-motif', tweaks.motif);
     document.body.setAttribute('data-density', tweaks.density);
   }, [tweaks]);
 
   function nav(id) {
+    if (id === 'internacional') {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      window.location.hash = '#internacional';
+      return;
+    }
+    if (id === 'alianza') {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      window.location.hash = '#alianza-internacional';
+      return;
+    }
     setActive(id);
     const el = document.getElementById(id);
     if (el) window.scrollTo({ top: el.offsetTop - 60, behavior: 'smooth' });
@@ -160,6 +180,46 @@ function App() {
     tweaks.heroVariant === 'fullbleed' ? FullBleedHero :
     Hero;
 
+  // City landing route — render only the landing (no main flow).
+  if (route.name === 'city') {
+    return (
+      <>
+        <CityLanding cityId={route.cityId} initialSection={route.section} onBack={goHome} />
+        <AndesAI />
+      </>
+    );
+  }
+
+  // Andes International route — landing standalone, sin home.
+  if (route.name === 'international') {
+    return (
+      <>
+        <AndesInternational onBack={goHome} />
+        <AndesAI />
+      </>
+    );
+  }
+
+  // Alianza Internacional route — landing de socios estratégicos.
+  if (route.name === 'alliance') {
+    return (
+      <>
+        <AllianceLanding onBack={goHome} />
+        <AndesAI />
+      </>
+    );
+  }
+
+  // Add Property route — formulario de captación de inventario.
+  if (route.name === 'addProperty') {
+    return (
+      <>
+        <AddProperty onBack={goHome} />
+        <AndesAI />
+      </>
+    );
+  }
+
   return (
     <>
       <Navbar active={active} onNav={nav} />
@@ -174,10 +234,20 @@ function App() {
         <Properties />
       </main>
       <Footer />
-      <IncaAI />
+      <AndesAI />
       <Tweaks state={tweaks} setState={setTweaks} />
     </>
   );
+}
+
+function parseRoute(hash) {
+  // Supports "#ciudad/<id>" and "#ciudad/<id>/<section>" (e.g. cultura, gastronomia, propiedades).
+  const m = (hash || '').match(/^#ciudad\/([\w-]+)(?:\/(\w+))?$/);
+  if (m) return { name: 'city', cityId: m[1], section: m[2] || null };
+  if ((hash || '') === '#internacional') return { name: 'international' };
+  if ((hash || '') === '#alianza-internacional') return { name: 'alliance' };
+  if ((hash || '') === '#agregar-propiedad') return { name: 'addProperty' };
+  return { name: 'home' };
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);

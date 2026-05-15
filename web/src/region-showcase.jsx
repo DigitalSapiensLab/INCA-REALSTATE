@@ -2,9 +2,20 @@
 //   1. 4-column city carousel (per-page pagination with arrows + dots)
 //   2. General Culture & Tourism / Gastronomy / Living-in sections for the macro-region
 //   Individual cities have their own pages (see "Conocer ciudad" CTA on each card).
+
+// Renders text with *word* → italic coloured accent (same convention as intro.titular).
+function renderAccented(text, color) {
+  if (!text) return null;
+  return text.split(/(\*[^*]+\*)/g).map((chunk, i) =>
+    chunk.startsWith('*') && chunk.endsWith('*')
+      ? <em key={i} style={{fontStyle:'italic', color, fontWeight:300}}>{chunk.slice(1, -1)}</em>
+      : <React.Fragment key={i}>{chunk}</React.Fragment>
+  );
+}
 function RegionShowcase() {
   const [tipo, setTipo] = React.useState('costa');
   const [page, setPage] = React.useState(0);
+  const [paused, setPaused] = React.useState(false);
 
   const tipoTabs = [
     { id: 'costa',  label: 'Costa',  color: '#6FA8C9' },
@@ -33,6 +44,16 @@ function RegionShowcase() {
 
   // Reset page when tipo changes
   React.useEffect(() => { setPage(0); }, [tipo]);
+
+  // Auto-rotate the city carousel every 2 s. Pauses on hover so users can read.
+  // Loops back to page 0 after the last page.
+  React.useEffect(() => {
+    if (paused || totalPages <= 1) return;
+    const t = setInterval(() => {
+      setPage(p => (p + 1) % totalPages);
+    }, 2000);
+    return () => clearInterval(t);
+  }, [paused, totalPages, tipo]);
 
   // Keyboard arrow navigation inside the carousel
   const onKey = (e) => {
@@ -97,13 +118,10 @@ function RegionShowcase() {
                 subtitle={`Lo que puedes vivir en la ${macro.nombre.toLowerCase()} peruana`}
                 color={active.color} />
 
-              {/* 4 culture cards */}
-              <div style={{display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:24, marginBottom:72}}>
-                <CultureCard title="Patrimonio"   items={macro.cultura.patrimonio}   color={active.color} />
-                <CultureCard title="Festividades" items={macro.cultura.festividades} color={active.color} />
-                <CultureCard title="Idiomas"      items={macro.cultura.idiomas}      color={active.color} />
-                <CultureCard title="Artesanía"    items={macro.cultura.artesania}    color={active.color} />
-              </div>
+              {/* Editorial quote — cultura / movimiento / oportunidad (per-region copy) */}
+              {macro.quotes?.cultura && (
+                <EditorialQuote color={active.color} marginBottom={72} q={macro.quotes.cultura} />
+              )}
 
               {/* Tourism grid */}
               <div style={{display:'flex', justifyContent:'space-between', alignItems:'baseline', marginBottom:36, flexWrap:'wrap', gap:16}}>
@@ -130,6 +148,12 @@ function RegionShowcase() {
                 title="Gastronomía"
                 subtitle={`Los sabores que definen la ${macro.nombre.toLowerCase()}`}
                 color={active.color} />
+
+              {/* Editorial statement — gastronomía como motor económico (per-region copy) */}
+              {macro.quotes?.gastronomia && (
+                <EditorialQuote color={active.color} marginBottom={72} q={macro.quotes.gastronomia} />
+              )}
+
               <div style={{display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:0, border:'1px solid var(--border-dark)'}}>
                 {macro.gastronomia.map((g, i) => (
                   <div key={i} style={{
@@ -154,9 +178,31 @@ function RegionShowcase() {
                     <div style={{padding:32, flex:1, display:'flex', flexDirection:'column'}}>
                       <h4 style={{fontFamily:'var(--font-display)', fontSize:26, fontWeight:400, color:'var(--text-on-dark)', marginBottom:14}}>{g.nombre}</h4>
                       <p style={{fontSize:14, lineHeight:1.65, color:'var(--text-on-dark-muted)', marginBottom:18, flex:1}}>{g.desc}</p>
-                      <div style={{fontFamily:'var(--font-mono)', fontSize:10, letterSpacing:'0.2em', color:active.color, textTransform:'uppercase'}}>
+                      <div style={{fontFamily:'var(--font-mono)', fontSize:10, letterSpacing:'0.2em', color:active.color, textTransform:'uppercase', marginBottom: g.cityId ? 18 : 0}}>
                         ◈ {g.donde}
                       </div>
+                      {g.cityId && (
+                        <button
+                          onClick={() => {
+                            window.scrollTo({ top: 0, behavior: 'instant' });
+                            window.location.hash = `#ciudad/${g.cityId}/gastronomia`;
+                          }}
+                          style={{
+                            marginTop:'auto',
+                            display:'flex', justifyContent:'space-between', alignItems:'center',
+                            padding:'12px 16px',
+                            border:`1px solid ${active.color}55`,
+                            background:'transparent',
+                            color: active.color,
+                            fontFamily:'var(--font-mono)', fontSize:10, letterSpacing:'0.22em', textTransform:'uppercase',
+                            cursor:'pointer', transition:'all .2s ease',
+                          }}
+                          onMouseEnter={e => { e.currentTarget.style.background = `${active.color}14`; e.currentTarget.style.borderColor = active.color; }}
+                          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = `${active.color}55`; }}>
+                          <span>Me interesa esta ciudad</span>
+                          <span>→</span>
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -204,7 +250,13 @@ function RegionShowcase() {
                 </div>
                 <button onClick={() => {
                   const el = document.getElementById('ciudades-carousel');
-                  if (el) window.scrollTo({top: el.offsetTop - 120, behavior:'smooth'});
+                  if (!el) return;
+                  // Absolute document position (offsetTop is unreliable with nested positioned ancestors).
+                  // Offset = fixed navbar (~80px) + sticky region selector (~76px) + breathing room.
+                  const top = el.getBoundingClientRect().top + window.scrollY - 170;
+                  window.scrollTo({ top, behavior: 'smooth' });
+                  // Move keyboard focus into the carousel so arrow-key paging starts working.
+                  setTimeout(() => el.focus({ preventScroll: true }), 600);
                 }}
                 style={{
                   display:'inline-flex', alignItems:'center', gap:14,
@@ -220,7 +272,14 @@ function RegionShowcase() {
           </div>
 
           {/* ───────────── CARRUSEL DE CIUDADES (después del CTA) ───────────── */}
-          <div id="ciudades-carousel" style={rsStyles.carouselWrap} onKeyDown={onKey} tabIndex={-1}>
+          <div id="ciudades-carousel"
+               style={rsStyles.carouselWrap}
+               onKeyDown={onKey}
+               onMouseEnter={() => setPaused(true)}
+               onMouseLeave={() => setPaused(false)}
+               onFocus={() => setPaused(true)}
+               onBlur={() => setPaused(false)}
+               tabIndex={-1}>
             <div className="motif-pattern" style={{opacity:0.35}} />
             <div className="wrap" style={{position:'relative', zIndex:1}}>
 
@@ -236,6 +295,25 @@ function RegionShowcase() {
                   <h2 style={{fontFamily:'var(--font-display)', fontSize:'clamp(44px, 5vw, 72px)', fontWeight:300, letterSpacing:'-0.025em', lineHeight:1, color:'var(--text-on-dark)'}}>
                     Ciudades de <em style={{fontStyle:'italic', color: active.color}}>{active.label}</em>
                   </h2>
+                  {macro.quotes?.ciudades && (
+                    <>
+                      <p style={{fontSize:17, lineHeight:1.7, color:'var(--text-on-dark-muted)', fontWeight:300, marginTop:22, maxWidth:640}}>
+                        {renderAccented(macro.quotes.ciudades.lede, active.color)}
+                      </p>
+                      <div style={{
+                        fontFamily:'var(--font-display)',
+                        fontSize:'clamp(18px, 1.6vw, 24px)',
+                        fontStyle:'italic',
+                        color: active.color,
+                        marginTop:14,
+                        fontWeight:300,
+                        letterSpacing:'-0.005em',
+                        lineHeight:1.4,
+                      }}>
+                        {macro.quotes.ciudades.punch}
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 <div style={rsStyles.carouselNav}>
@@ -306,10 +384,10 @@ function MacroIntro({ macro, color }) {
   // Reset the slider when the macro-region changes
   React.useEffect(() => { setIdx(0); }, [macro.nombre]);
 
-  // Auto-rotate every 5.5s unless paused (hover)
+  // Auto-rotate every 2s unless paused (hover)
   React.useEffect(() => {
     if (paused || slides.length <= 1) return;
-    const t = setInterval(() => setIdx(i => (i + 1) % slides.length), 5500);
+    const t = setInterval(() => setIdx(i => (i + 1) % slides.length), 2000);
     return () => clearInterval(t);
   }, [paused, slides.length, macro.nombre]);
 
@@ -476,6 +554,53 @@ function SectionTitle({ num, quechua, title, subtitle, color }) {
   );
 }
 
+// Reusable editorial pull-quote — reads { lead, body, cierre } with *word* accents.
+function EditorialQuote({ q, color, marginBottom = 0, marginTop = 0 }) {
+  return (
+    <div style={{
+      display:'grid',
+      gridTemplateColumns:'auto 1fr',
+      gap:48,
+      padding:'56px 48px',
+      marginTop,
+      marginBottom,
+      border:'1px solid var(--border-dark)',
+      background:'var(--bg-tertiary)',
+      borderLeft:`3px solid ${color}`,
+    }}>
+      <div style={{
+        fontFamily:'var(--font-display)',
+        fontSize:120,
+        lineHeight:0.7,
+        color,
+        fontWeight:300,
+        alignSelf:'start',
+      }}>&ldquo;</div>
+      <div>
+        <p style={{
+          fontFamily:'var(--font-display)',
+          fontSize:'clamp(22px, 2.2vw, 32px)',
+          fontStyle:'italic',
+          lineHeight:1.4,
+          color:'var(--text-on-dark)',
+          fontWeight:300,
+          marginBottom:28,
+          letterSpacing:'-0.005em',
+          maxWidth:820,
+        }}>
+          {renderAccented(q.lead, color)}
+        </p>
+        <p style={{fontSize:16, lineHeight:1.75, color:'var(--text-on-dark-muted)', fontWeight:300, marginBottom:22, maxWidth:760}}>
+          {renderAccented(q.body, color)}
+        </p>
+        <p style={{fontSize:16, lineHeight:1.75, color:'var(--text-on-dark)', fontWeight:400, maxWidth:760}}>
+          {renderAccented(q.cierre, color)}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function CultureCard({ title, items, color }) {
   return (
     <div style={{padding:28, border:'1px solid var(--border-dark)', background:'var(--bg-tertiary)'}}>
@@ -493,8 +618,15 @@ function CultureCard({ title, items, color }) {
 }
 
 function TourCard({ t, i, color }) {
+  const goToCity = () => {
+    if (!t.cityId) return;
+    // Anchor directly to the cultura section so the user lands reading "01 Cultura".
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    window.location.hash = `#ciudad/${t.cityId}/cultura`;
+  };
+
   return (
-    <article style={{padding:32, border:'1px solid var(--border-dark)', background:'var(--bg-tertiary)', transition:'border-color .25s ease'}}>
+    <article style={{padding:32, border:'1px solid var(--border-dark)', background:'var(--bg-tertiary)', transition:'border-color .25s ease', display:'flex', flexDirection:'column'}}>
       {t.img && (
         <div style={{position:'relative', aspectRatio:'4/3', overflow:'hidden', marginBottom:22, background:'var(--bg-primary)'}}>
           <img src={t.img} alt={t.nombre} loading="lazy" style={{
@@ -518,9 +650,27 @@ function TourCard({ t, i, color }) {
       )}
       <h4 style={{fontFamily:'var(--font-display)', fontSize:22, fontWeight:400, color:'var(--text-on-dark)', marginBottom:10}}>{t.nombre}</h4>
       <p style={{fontSize:13, lineHeight:1.6, color:'var(--text-on-dark-muted)', marginBottom:20}}>{t.desc}</p>
-      <div style={{paddingTop:14, borderTop:'1px solid var(--border-dark)', fontFamily:'var(--font-mono)', fontSize:10, letterSpacing:'0.2em', color:'var(--text-on-dark-subtle)', textTransform:'uppercase'}}>
+      <div style={{paddingTop:14, borderTop:'1px solid var(--border-dark)', fontFamily:'var(--font-mono)', fontSize:10, letterSpacing:'0.2em', color:'var(--text-on-dark-subtle)', textTransform:'uppercase', marginBottom: t.cityId ? 18 : 0}}>
         ⟶ {t.tiempo}
       </div>
+      {t.cityId && (
+        <button onClick={goToCity}
+          style={{
+            marginTop:'auto',
+            display:'flex', justifyContent:'space-between', alignItems:'center',
+            padding:'12px 16px',
+            border:`1px solid ${color}55`,
+            background:'transparent',
+            color: color,
+            fontFamily:'var(--font-mono)', fontSize:10, letterSpacing:'0.22em', textTransform:'uppercase',
+            cursor:'pointer', transition:'all .2s ease',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = `${color}14`; e.currentTarget.style.borderColor = color; }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = `${color}55`; }}>
+          <span>Me interesa esta ciudad</span>
+          <span>→</span>
+        </button>
+      )}
     </article>
   );
 }
@@ -592,10 +742,13 @@ function CityCard({ city, tipoColor }) {
           <StatCell label="Retorno" value={`${city.retorno}%`} border gold />
         </div>
 
-        {/* CTA */}
+        {/* CTA — navigates to the city landing via hash route (#ciudad/<id>). */}
         <a
           href={`#ciudad/${city.id}`}
-          onClick={(e) => { /* Placeholder — city pages will be wired later */ }}
+          onClick={(e) => {
+            // Force a top scroll. The hashchange event handles the actual route switch in App.
+            window.scrollTo({ top: 0, behavior: 'instant' });
+          }}
           style={{
             display:'flex', justifyContent:'space-between', alignItems:'center',
             padding:'14px 18px',

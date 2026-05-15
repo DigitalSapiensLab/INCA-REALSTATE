@@ -1,27 +1,77 @@
-// Investment calculator
+// Investment calculator.
+// Apreciación real por ciudad (fuente BCRP + CAPECO 2015-2025).
+// Comparativa contra Madrid usa yield NETO Salamanca (Idealista 2025).
+// El usuario puede elegir entre 25+ zonas curadas (window.INVEST_LOCATIONS)
+// agrupadas por macro región (Costa · Sierra · Selva).
 function Calculator() {
-  const [price, setPrice] = React.useState(450000);
-  const [yieldPct, setYieldPct] = React.useState(8.2);
+  // Fuente única de verdad: INVEST_LOCATIONS en data.jsx.
+  const locations = window.INVEST_LOCATIONS || [];
+
+  const [city, setCity] = React.useState('cusco-sanblas');
+  const [macro, setMacro] = React.useState('sierra');
+
+  const activeCity = locations.find(x => x.id === city) || locations[0];
+  const initialYield = activeCity ? activeCity.yield : 7.5;
+  const initialPrice = activeCity ? Math.round(activeCity.precioM2 * 180) : 450000; // ~180 m² de referencia
+
+  const [price, setPrice] = React.useState(initialPrice);
+  const [yieldPct, setYieldPct] = React.useState(initialYield);
   const [years, setYears] = React.useState(10);
-  const [city, setCity] = React.useState('cusco');
 
-  const cities = [
-    { id: 'cusco', nombre: 'Cusco · San Blas', yieldVal: 9.4, precioM2: 1820 },
-    { id: 'lima', nombre: 'Lima · Miraflores', yieldVal: 7.2, precioM2: 2180 },
-    { id: 'arequipa', nombre: 'Arequipa · Cayma', yieldVal: 7.8, precioM2: 1540 },
-    { id: 'barranco', nombre: 'Lima · Barranco', yieldVal: 7.9, precioM2: 1920 },
-  ];
+  const madrid = window.MADRID_BENCHMARK || { yield_neto: 2.8, apreciacion: 4.5, barrio: 'Barrio de Salamanca' };
 
+  // Cuando cambia la zona: actualiza yield y precio sugerido.
+  // Si el usuario después toca los sliders, su valor prevalece (no se sobreescribe).
+  const [touchedPrice, setTouchedPrice] = React.useState(false);
+  const [touchedYield, setTouchedYield] = React.useState(false);
   React.useEffect(() => {
-    const c = cities.find(x => x.id === city);
-    if (c) setYieldPct(c.yieldVal);
+    if (!activeCity) return;
+    if (!touchedYield) setYieldPct(activeCity.yield);
+    if (!touchedPrice) setPrice(Math.round(activeCity.precioM2 * 180));
   }, [city]);
+
+  // Macros disponibles (deducidas de las zonas).
+  const macros = [
+    { id: 'costa',  label: 'Costa',  color: '#6FA8C9', count: locations.filter(l => l.macro === 'costa').length },
+    { id: 'sierra', label: 'Sierra', color: '#C9A961', count: locations.filter(l => l.macro === 'sierra').length },
+    { id: 'selva',  label: 'Selva',  color: '#7FB069', count: locations.filter(l => l.macro === 'selva').length },
+  ];
+  const activeMacro = macros.find(m => m.id === macro) || macros[1];
+  const zonasOfMacro = locations.filter(l => l.macro === macro);
+
+  function selectCity(id) {
+    const loc = locations.find(l => l.id === id);
+    if (!loc) return;
+    setCity(id);
+    setMacro(loc.macro);
+    setTouchedPrice(false);
+    setTouchedYield(false);
+  }
+  function selectMacro(id) {
+    setMacro(id);
+    // Si la zona actual no pertenece al macro elegido, saltar a la primera del macro.
+    const stillValid = locations.find(l => l.id === city && l.macro === id);
+    if (!stillValid) {
+      const first = locations.find(l => l.macro === id);
+      if (first) {
+        setCity(first.id);
+        setTouchedPrice(false);
+        setTouchedYield(false);
+      }
+    }
+  }
 
   const annualRent = price * (yieldPct / 100);
   const monthly = annualRent / 12;
-  // Appreciation estimate — 4% annual compound
-  const futureValue = price * Math.pow(1.04, years) + annualRent * years;
+  const apreciacion = activeCity.apreciacion / 100;
+  // Valor futuro = precio compuesto a apreciación real + suma de rentas históricas
+  const futureValue = price * Math.pow(1 + apreciacion, years) + annualRent * years;
   const totalReturn = ((futureValue - price) / price) * 100;
+
+  // Diferencial vs Madrid (yield neto + apreciación)
+  const madridTotal = madrid.yield_neto + madrid.apreciacion;       // ~7.3% anual total ciudad
+  const peTotal     = yieldPct + activeCity.apreciacion;            // total Perú con esta zona
+  const diferencial = (peTotal - madridTotal).toFixed(1);
 
   return (
     <section id="inversion" style={calcStyles.section}>
@@ -38,45 +88,82 @@ function Calculator() {
               <em style={{fontStyle:'italic', color:'var(--gold-primary)'}}>retorno</em> en Perú.
             </h2>
             <p style={{fontSize:17, lineHeight:1.7, color:'var(--text-on-dark-muted)', maxWidth:460, marginBottom:40}}>
-              Ajusta el valor, la zona y el horizonte temporal. Los retornos
-              están calculados sobre precios medios 2026 y apreciación anual
-              histórica del 4%.
+              Ajusta el valor, la zona y el horizonte temporal. Cifras
+              orientativas sobre precios medios 2026 y apreciación anual
+              histórica real por ciudad. Sin promesas — solo datos.
             </p>
 
             <div style={{display:'flex', flexDirection:'column', gap:28}}>
-              {/* City selector */}
+              {/* ─── ZONA SELECTOR: macro chips + dropdown agrupado ─── */}
               <div>
-                <div className="quechua" style={{marginBottom:12}}>Zona</div>
-                <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:8}}>
-                  {cities.map(c => (
-                    <button key={c.id} onClick={() => setCity(c.id)}
-                      style={{
-                        padding:'14px 16px', textAlign:'left',
-                        border: '1px solid ' + (city===c.id ? 'var(--gold-primary)' : 'var(--border-dark)'),
-                        background: city===c.id ? 'var(--gold-bg)' : 'transparent',
-                        color: city===c.id ? 'var(--gold-primary)' : 'var(--text-on-dark-muted)',
-                        cursor:'pointer', transition:'all .2s ease',
-                      }}>
-                      <div style={{fontSize:13, fontWeight:500}}>{c.nombre}</div>
-                      <div style={{fontFamily:'var(--font-mono)', fontSize:10, letterSpacing:'0.15em', marginTop:4, opacity:0.7}}>
-                        ${c.precioM2}/m² · {c.yieldVal}%
-                      </div>
-                    </button>
-                  ))}
+                <div className="quechua" style={{marginBottom:12}}>Zona de inversión</div>
+
+                {/* Macro chips */}
+                <div style={{display:'flex', gap:8, marginBottom:14}}>
+                  {macros.map(m => {
+                    const isActive = macro === m.id;
+                    return (
+                      <button key={m.id} type="button" onClick={() => selectMacro(m.id)}
+                        style={{
+                          flex:1,
+                          padding:'12px 14px',
+                          border:'1px solid ' + (isActive ? m.color : 'var(--border-dark)'),
+                          background: isActive ? `${m.color}14` : 'transparent',
+                          color: isActive ? m.color : 'var(--text-on-dark-muted)',
+                          fontFamily:'var(--font-mono)', fontSize:11, letterSpacing:'0.22em', textTransform:'uppercase',
+                          cursor:'pointer', transition:'all .2s ease',
+                        }}>
+                        {m.label}
+                        <span style={{opacity:0.6, marginLeft:8, fontSize:10}}>· {m.count}</span>
+                      </button>
+                    );
+                  })}
                 </div>
+
+                {/* Dropdown de zonas agrupado por región */}
+                <select value={city} onChange={e => selectCity(e.target.value)} style={calcStyles.select}>
+                  {macros.map(m => (
+                    <optgroup key={m.id} label={`— ${m.label.toUpperCase()} —`}>
+                      {locations.filter(l => l.macro === m.id).map(l => (
+                        <option key={l.id} value={l.id}>
+                          {l.nombre}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))}
+                </select>
+
+                {/* Panel editorial de la zona seleccionada */}
+                {activeCity && (
+                  <div style={calcStyles.zonePanel}>
+                    <div style={{display:'flex', justifyContent:'space-between', alignItems:'baseline', gap:14, flexWrap:'wrap'}}>
+                      <div style={{fontFamily:'var(--font-display)', fontSize:20, color:'var(--text-on-dark)', fontWeight:400, letterSpacing:'-0.01em'}}>
+                        {activeCity.nombre}
+                      </div>
+                      <div style={{fontFamily:'var(--font-mono)', fontSize:10, color: activeMacro.color, letterSpacing:'0.22em', textTransform:'uppercase'}}>
+                        {activeCity.tag}
+                      </div>
+                    </div>
+                    <div style={calcStyles.zoneStats}>
+                      <ZoneStat label="Precio m²" value={`$${activeCity.precioM2.toLocaleString('en-US')}`} />
+                      <ZoneStat label="Yield orientativo" value={`${activeCity.yield}%`} accent />
+                      <ZoneStat label="Apreciación anual" value={`${activeCity.apreciacion}%`} accent />
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Price slider */}
-              <SliderRow label="Inversión" value={`$${price.toLocaleString()}`} unit="USD">
-                <input type="range" min="100000" max="2000000" step="10000" value={price}
-                       onChange={e => setPrice(+e.target.value)}
+              <SliderRow label="Inversión" value={`$${price.toLocaleString('en-US')}`} unit="USD">
+                <input type="range" min="60000" max="2500000" step="5000" value={price}
+                       onChange={e => { setTouchedPrice(true); setPrice(+e.target.value); }}
                        style={calcStyles.slider} />
               </SliderRow>
 
               {/* Yield slider */}
               <SliderRow label="Rentabilidad anual" value={yieldPct.toFixed(1) + '%'} unit="alquiler">
                 <input type="range" min="4" max="12" step="0.1" value={yieldPct}
-                       onChange={e => setYieldPct(+e.target.value)}
+                       onChange={e => { setTouchedYield(true); setYieldPct(+e.target.value); }}
                        style={calcStyles.slider} />
               </SliderRow>
 
@@ -112,11 +199,15 @@ function Calculator() {
 
               <div style={{marginTop:40, padding:'20px 22px', background:'var(--gold-bg)', border:'1px solid var(--border-gold)'}}>
                 <div style={{fontFamily:'var(--font-mono)', fontSize:10, letterSpacing:'0.22em', color:'var(--gold-primary)', textTransform:'uppercase', marginBottom:8}}>
-                  Vs. Madrid · Barrio de Salamanca
+                  Vs. Madrid · {madrid.barrio}
                 </div>
-                <div style={{fontSize:14, color:'var(--text-on-dark)', lineHeight:1.6}}>
-                  Misma inversión de <strong style={{color:'var(--gold-primary)'}}>${price.toLocaleString()}</strong> rendiría
-                  un {(yieldPct - 3.5).toFixed(1)}% más que en el mejor barrio de Madrid (3.5%).
+                <div style={{fontSize:14, color:'var(--text-on-dark)', lineHeight:1.65}}>
+                  En el mejor barrio de Madrid esta misma inversión rinde un yield
+                  neto del <strong style={{color:'var(--text-on-dark-muted)'}}>{madrid.yield_neto}%</strong> tras impuestos
+                  y comunidad, con apreciación histórica del <strong style={{color:'var(--text-on-dark-muted)'}}>{madrid.apreciacion}%</strong>.
+                  En <strong style={{color:'var(--gold-primary)'}}>{activeCity.nombre}</strong> el
+                  total entre renta y apreciación supera a Madrid en
+                  <strong style={{color:'var(--gold-primary)'}}> +{diferencial} puntos</strong> al año.
                 </div>
               </div>
 
@@ -156,6 +247,19 @@ function Result({ label, val }) {
   );
 }
 
+function ZoneStat({ label, value, accent }) {
+  return (
+    <div>
+      <div style={{fontFamily:'var(--font-mono)', fontSize:9, letterSpacing:'0.22em', color:'var(--text-on-dark-subtle)', textTransform:'uppercase', marginBottom:6}}>
+        {label}
+      </div>
+      <div style={{fontFamily:'var(--font-display)', fontSize:20, fontWeight:400, color: accent ? 'var(--gold-primary)' : 'var(--text-on-dark)', letterSpacing:'-0.01em'}}>
+        {value}
+      </div>
+    </div>
+  );
+}
+
 const calcStyles = {
   section: {
     position: 'relative',
@@ -173,6 +277,36 @@ const calcStyles = {
     background: 'var(--border-dark)',
     outline: 'none',
     cursor: 'pointer',
+  },
+  select: {
+    width: '100%',
+    padding: '14px 18px',
+    background: 'var(--bg-tertiary)',
+    color: 'var(--text-on-dark)',
+    border: '1px solid var(--border-dark)',
+    fontFamily: 'var(--font-sans)',
+    fontSize: 14,
+    cursor: 'pointer',
+    appearance: 'none',
+    backgroundImage:'linear-gradient(45deg, transparent 50%, var(--gold-primary) 50%), linear-gradient(135deg, var(--gold-primary) 50%, transparent 50%)',
+    backgroundPosition:'calc(100% - 22px) 50%, calc(100% - 17px) 50%',
+    backgroundSize:'5px 5px, 5px 5px',
+    backgroundRepeat:'no-repeat',
+    paddingRight: 44,
+  },
+  zonePanel: {
+    marginTop: 14,
+    padding: '18px 20px',
+    background: 'rgba(201, 169, 97, 0.04)',
+    border: '1px solid var(--border-gold)',
+  },
+  zoneStats: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(3, 1fr)',
+    gap: 18,
+    marginTop: 18,
+    paddingTop: 16,
+    borderTop: '1px solid var(--border-dark)',
   },
   results: {
     position: 'relative',

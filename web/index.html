@@ -3,11 +3,16 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Inca Estates — No vendemos casas. Vendemos Perú.</title>
+<title>Andes Capital Estates — No vendemos casas. Vendemos Perú.</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Cormorant+Garamond:wght@300;400;500;600&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+
+<!-- Preload hero imagery so the first slide is painted on first paint, not after JS boot -->
+<link rel="preload" as="image" href="assets/hero/slide-01.png">
+<link rel="preload" as="image" href="assets/hero/slide-02.png">
+<link rel="preload" as="image" href="assets/hero/slide-03.png">
 
 <style>
 /* ---------- TWEAKABLE DEFAULTS ---------- */
@@ -173,47 +178,73 @@ a { color: inherit; text-decoration: none; }
 /* ---------- NAVBAR ---------- */
 .navbar {
   position: fixed; top: 0; left: 0; right: 0; z-index: 40;
-  padding: 22px var(--gutter);
-  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px var(--gutter);
+  display: flex; align-items: center; gap: 28px;
   background: linear-gradient(180deg, rgba(14,16,20,0.95), rgba(14,16,20,0.6));
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border-dark);
 }
-.brand { display: flex; align-items: center; gap: 14px; }
-.brand-mark {
-  width: 40px; height: 40px; position: relative;
-}
+.brand { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.brand-mark { width: 38px; height: 38px; position: relative; flex-shrink: 0; }
 .brand-mark svg { width: 100%; height: 100%; }
-.brand-text { display: flex; flex-direction: column; line-height: 1; }
-.brand-text .name { font-family: var(--font-display); font-size: 20px; letter-spacing: 0.04em; color: var(--text-on-dark); }
-.brand-text .sub { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.32em; color: var(--gold-primary); margin-top: 4px; text-transform: uppercase; }
+.brand-text {
+  display: flex; flex-direction: column;
+  align-items: center; text-align: center;
+  line-height: 1.05;
+}
+.brand-text .name-top,
+.brand-text .name-bot {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: var(--text-on-dark);
+  white-space: nowrap;
+}
+.brand-text .name-bot {
+  letter-spacing: 0.18em;
+  font-size: 14px;
+  color: var(--gold-primary);
+  margin-top: 2px;
+}
 
-.nav-links { display: flex; gap: 36px; }
+.nav-links {
+  flex: 1;
+  display: flex; justify-content: center; align-items: center;
+  gap: 22px;
+}
 .nav-links a {
-  font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; font-weight: 400;
+  font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 400;
   color: var(--text-on-dark-muted); transition: color .2s ease;
   position: relative; padding: 6px 0;
+  white-space: nowrap;
 }
 .nav-links a:hover, .nav-links a.active { color: var(--gold-primary); }
 .nav-links a.active::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: var(--gold-primary); }
 
-.nav-right { display: flex; align-items: center; gap: 28px; }
-.lang-toggle { display: flex; gap: 10px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.2em; }
-.lang-toggle span { color: var(--text-on-dark-subtle); cursor: pointer; }
-.lang-toggle span.active { color: var(--gold-primary); }
-.lang-toggle .sep { color: var(--text-on-dark-subtle); }
+.nav-right { display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
 
-.phone-chip {
-  display: flex; align-items: center; gap: 10px;
-  padding: 10px 14px; border: 1px solid var(--border-dark);
-  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em;
+.nav-cta {
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 9px 14px;
+  border: 1px solid var(--gold-primary);
+  background: rgba(201, 169, 97, 0.08);
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.14em;
+  text-transform: uppercase;
   color: var(--gold-primary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .25s ease, color .25s ease, transform .25s ease;
 }
-.phone-chip::before {
-  content: ''; width: 6px; height: 6px; border-radius: 50%;
+.nav-cta:hover { background: var(--gold-primary); color: #0E1014; transform: translateX(2px); }
+.nav-cta-dot {
+  width: 6px; height: 6px; border-radius: 50%;
   background: var(--gold-primary); box-shadow: 0 0 8px var(--gold-primary);
+  transition: background .25s ease, box-shadow .25s ease;
+  flex-shrink: 0;
 }
+.nav-cta:hover .nav-cta-dot { background: #0E1014; box-shadow: none; }
 
 /* ---------- SOCIAL SIDEBAR ---------- */
 .social-sidebar {
@@ -285,7 +316,8 @@ section { position: relative; }
 
 @media (max-width: 960px) {
   :root { --gutter: 24px; --section-py: 96px; }
-  .social-sidebar, .nav-links, .phone-chip { display: none; }
+  .social-sidebar, .nav-links { display: none; }
+  .nav-cta { padding: 9px 12px; font-size: 10px; letter-spacing: 0.14em; }
   .section-number { font-size: 72px; }
 }
 </style>
@@ -312,6 +344,7 @@ section { position: relative; }
 <script type="text/babel" src="src/data.jsx"></script>
 <script type="text/babel" src="src/regiondata.jsx"></script>
 <script type="text/babel" src="src/cities-data.jsx"></script>
+<script type="text/babel" src="src/city-landings-data.jsx"></script>
 <script type="text/babel" src="src/macro-region-data.jsx"></script>
 <script type="text/babel" src="src/region-showcase.jsx"></script>
 <script type="text/babel" src="src/nav.jsx"></script>
@@ -322,10 +355,14 @@ section { position: relative; }
 <script type="text/babel" src="src/calculator.jsx"></script>
 <script type="text/babel" src="src/costliving.jsx"></script>
 <script type="text/babel" src="src/properties.jsx"></script>
+<script type="text/babel" src="src/andes-international.jsx"></script>
+<script type="text/babel" src="src/alliance.jsx"></script>
+<script type="text/babel" src="src/add-property.jsx"></script>
 <script type="text/babel" src="src/gastronomia.jsx"></script>
 <script type="text/babel" src="src/footer.jsx"></script>
 <script type="text/babel" src="src/chat.jsx"></script>
 <script type="text/babel" src="src/tweaks.jsx"></script>
+<script type="text/babel" src="src/city-landing.jsx"></script>
 <script type="text/babel" src="src/app.jsx"></script>
 
 </body>

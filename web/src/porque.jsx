@@ -6,28 +6,28 @@ function PorquePeru() {
       titulo: 'Cultura viva',
       desc: 'Once mil años de historia continua. Desde Caral a los Incas, pasando por virreinato y república. Cinco sitios UNESCO. Idiomas que siguen vivos: quechua, aimara, asháninka.',
       datos: [['08', 'Sitios UNESCO'], ['47', 'Culturas vivas'], ['1532', 'Cusco capital Inca']],
-      img: 'https://images.unsplash.com/photo-1587595431973-160d0d94add1?w=1400&q=80',
+      img: 'assets/intro-costa/cultura.png',
     },
     {
       q: 'ꟼ 02', num: 'ISKAY',
       titulo: 'Gastronomía de renombre',
       desc: 'La cocina peruana figura entre las tres más reconocidas del mundo. Central y Maido encabezan la lista mundial. Cada región, una carta distinta: ceviche en la costa, pachamanca en la sierra, juane en la selva.',
       datos: [['#1', 'World\'s 50 Best'], ['491', 'Variedades de papa'], ['3000', 'Variedades de quinua']],
-      img: 'https://images.unsplash.com/photo-1551218808-94e220e084d2?w=1400&q=80',
+      img: 'assets/intro-costa/gastronomia.png',
     },
     {
       q: 'ꟼ 03', num: 'KIMSA',
       titulo: 'Tres mundos en un país',
       desc: 'Desayuno en el Pacífico, almuerzo a 3.400m entre arquitectura inca, cena rodeado de Amazonía. Perú es el único país del mundo donde puedes vivir tres climas distintos en veinticuatro horas.',
       datos: [['84', 'Zonas de vida'], ['11%', 'Bosques del mundo'], ['3', 'Ecosistemas mayores']],
-      img: 'https://images.unsplash.com/photo-1526392060635-9d6019884377?w=1400&q=80',
+      img: 'assets/hero/slide-03.png',
     },
     {
       q: 'ꟼ 04', num: 'TAWA',
       titulo: 'Inversión con retorno',
       desc: 'El extranjero compra con los mismos derechos que un peruano. Rentabilidad anual superior a cualquier capital europea. Visa de inversionista desde 60.000 USD. Proceso de compra completo en 2-3 meses.',
       datos: [['9.4%', 'Retorno Cusco'], ['7.2%', 'Retorno Lima'], ['3%', 'Alcabala única']],
-      img: 'https://images.unsplash.com/photo-1531065208531-4036c0dba3ca?w=1400&q=80',
+      img: 'assets/hero/slide-01.png',
     },
   ];
 

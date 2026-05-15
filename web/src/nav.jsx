@@ -5,6 +5,8 @@ function Navbar({ active, onNav }) {
     { id: 'peru', label: 'Descubrir Perú' },
     { id: 'regiones', label: 'Regiones' },
     { id: 'propiedades', label: 'Propiedades' },
+    { id: 'internacional', label: 'Andes International' },
+    { id: 'alianza', label: 'Alianza Internacional' },
     { id: 'inversion', label: 'Inversión' },
     { id: 'contacto', label: 'Contacto' },
   ];
@@ -20,8 +22,8 @@ function Navbar({ active, onNav }) {
           </svg>
         </div>
         <div className="brand-text">
-          <span className="name">INCA ESTATES</span>
-          <span className="sub">Propiedad · Perú</span>
+          <span className="name-top">ANDES CAPITAL</span>
+          <span className="name-bot">ESTATES</span>
         </div>
       </div>
       <div className="nav-links">
@@ -33,14 +35,18 @@ function Navbar({ active, onNav }) {
         ))}
       </div>
       <div className="nav-right">
-        <div className="lang-toggle">
-          <span className="active">ES</span>
-          <span className="sep">·</span>
-          <span>EN</span>
-          <span className="sep">·</span>
-          <span>PT</span>
-        </div>
-        <div className="phone-chip">+34 910 555 092</div>
+        <a
+          href="#agregar-propiedad"
+          className="nav-cta"
+          onClick={(e) => {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'instant' });
+            window.location.hash = '#agregar-propiedad';
+          }}
+        >
+          <span className="nav-cta-dot" />
+          Agregar propiedad
+        </a>
       </div>
     </nav>
   );

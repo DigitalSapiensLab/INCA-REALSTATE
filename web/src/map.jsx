@@ -78,7 +78,13 @@ function PeruMap() {
                   ))}
                 </div>
 
-                <button className="btn-ghost" style={{marginTop:32, width:'100%', justifyContent:'space-between'}}>
+                <button
+                  className="btn-ghost"
+                  onClick={() => {
+                    window.scrollTo({ top: 0, behavior: 'instant' });
+                    window.location.hash = `#ciudad/${region.id}`;
+                  }}
+                  style={{marginTop:32, width:'100%', justifyContent:'space-between'}}>
                   Explorar {region.nombre} <span>→</span>
                 </button>
               </div>
